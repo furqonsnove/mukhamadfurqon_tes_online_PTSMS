@@ -5,74 +5,105 @@ namespace App\Http\Controllers\API;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function register(Request $request)
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
     {
-        //set validation
-        $validator = Validator::make($request->all(), [
-            'name'      => 'required',
-            'email'     => 'required|email|unique:users',
-            'password'  => 'required|min:8'
-        ]);
-
-        //if validation fails
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        //query create user
-        $user = User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => bcrypt($request->password)
-        ]);
-
-        //respnse if created
-        if ($user) {
-            return response()->json([
-                'success' => true,
-                'user'    => $user,
-            ], 201);
-        }
-
-        //response insert failed
+        $user = User::all();
         return response()->json([
-            'success' => false,
-        ], 409);
+            'status' => 'success',
+            'user' => $user,
+        ]);
     }
 
-    public function login(Request $request)
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
     {
-        //set validation
-        $validator = Validator::make($request->all(), [
-            'email'     => 'required',
-            'password'  => 'required'
-        ]);
+        //
+    }
 
-        //if validation fails
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
 
-        //get credentials from request
-        $credentials = $request->only('email', 'password');
-
-        //if auth failed
-        if (!$token = auth()->guard('api')->attempt($credentials)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Email atau Password Anda salah'
-            ], 401);
-        }
-
-        //if auth success
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $user = User::find($id);
         return response()->json([
-            'success' => true,
-            'user'    => auth()->guard('api')->user(),
-            'token'   => $token
-        ], 200);
+            'status' => 'success',
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+
+        $user = User::find($id);
+        $user->update($request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User updated successfully',
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $user = User::find($id);
+        $user->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User deleted successfully',
+            'user' => $user,
+        ]);
     }
 }
